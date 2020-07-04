@@ -61,7 +61,6 @@ class Session implements SessionInterface
     /**
      * @param string                  $uri
      * @param GuzzleClient|HttpClient $httpClient
-     * @param ConfigInterface         $config
      */
     public function __construct($uri, $httpClient, ConfigInterface $config)
     {
@@ -116,7 +115,6 @@ class Session implements SessionInterface
 
     /**
      * @param string|null $query
-     * @param array       $parameters
      * @param string|null $tag
      *
      * @return Pipeline
@@ -133,8 +131,6 @@ class Session implements SessionInterface
     }
 
     /**
-     * @param Pipeline $pipeline
-     *
      * @throws \GraphAware\Neo4j\Client\Exception\Neo4jException
      *
      * @return \GraphAware\Common\Result\ResultCollection
@@ -168,8 +164,6 @@ class Session implements SessionInterface
     }
 
     /**
-     * @param Pipeline $pipeline
-     *
      * @return RequestInterface
      */
     public function prepareRequest(Pipeline $pipeline)
@@ -191,10 +185,8 @@ class Session implements SessionInterface
             'statements' => $statements,
         ]);
         $headers = [
-            [
-                'X-Stream' => true,
-                'Content-Type' => 'application/json',
-            ],
+            'X-Stream' => true,
+            'Content-Type' => 'application/json',
         ];
 
         return $this->requestFactory->createRequest('POST', sprintf('%s/db/data/transaction/commit', $this->uri), $headers, $body);
@@ -222,7 +214,7 @@ class Session implements SessionInterface
      */
     public function begin()
     {
-        $request = $this->requestFactory->createRequest('POST', sprintf('%s/db/data/transaction', $this->uri));
+        $request = $this->requestFactory->createRequest('POST', sprintf('%s/db/data/transaction', $this->uri), ['Content-Type'=>'application/json']);
 
         try {
             return $this->httpClient->sendRequest($request);
@@ -240,8 +232,7 @@ class Session implements SessionInterface
     }
 
     /**
-     * @param int   $transactionId
-     * @param array $statementsStack
+     * @param int $transactionId
      *
      * @throws Neo4jException
      *
@@ -263,7 +254,7 @@ class Session implements SessionInterface
         }
 
         $headers = [
-            'X-Stream' => true,
+            'X-Stream' => 'true',
             'Content-Type' => 'application/json',
         ];
 
@@ -305,7 +296,7 @@ class Session implements SessionInterface
      */
     public function commitTransaction($transactionId)
     {
-        $request = $this->requestFactory->createRequest('POST', sprintf('%s/db/data/transaction/%d/commit', $this->uri, $transactionId));
+        $request = $this->requestFactory->createRequest('POST', sprintf('%s/db/data/transaction/%d/commit', $this->uri, $transactionId), ['Content-Type'=>'application/json']);
         try {
             $response = $this->httpClient->sendRequest($request);
             $data = json_decode((string) $response->getBody(), true);
@@ -335,7 +326,7 @@ class Session implements SessionInterface
      */
     public function rollbackTransaction($transactionId)
     {
-        $request = $this->requestFactory->createRequest('DELETE', sprintf('%s/db/data/transaction/%d', $this->uri, $transactionId));
+        $request = $this->requestFactory->createRequest('DELETE', sprintf('%s/db/data/transaction/%d', $this->uri, $transactionId), ['Content-Type'=>'application/json']);
 
         try {
             $this->httpClient->sendRequest($request);

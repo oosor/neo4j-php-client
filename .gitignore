@@ -7,4 +7,5 @@ test.php
 tests/_reports
 tests/database_settings.yml
 vendor/
+.idea
 phpunit.xml
