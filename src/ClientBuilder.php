@@ -21,7 +21,7 @@ class ClientBuilder
 {
     const PREFLIGHT_ENV_DEFAULT = 'NEO4J_DB_VERSION';
 
-    const DEFAULT_TIMEOUT = 5;
+    const DEFAULT_TIMEOUT = 10;
 
     const TIMEOUT_CONFIG_KEY = 'timeout';
 
